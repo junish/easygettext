@@ -22,9 +22,12 @@ const endDelimiter = argv.endDelimiter === undefined ? constants.DEFAULT_DELIMIT
 const extraAttribute = argv.attribute || false;
 const extraFilter = argv.filter || false;
 const filterPrefix = argv.filterPrefix || constants.DEFAULT_FILTER_PREFIX;
+const parseScript = argv.parseScript === undefined ? true : argv.parseScript === 'true';
 
 if (!quietMode && (!files || files.length === 0)) {
-  console.log('Usage:\n\tgettext-extract [--attribute EXTRA-ATTRIBUTE] [--filterPrefix FILTER-PREFIX] [--output OUTFILE] <FILES>');
+  console.log(
+    'Usage:\n\tgettext-extract [--attribute EXTRA-ATTRIBUTE] [--filterPrefix FILTER-PREFIX] [--parseScript BOOLEAN] [--output OUTFILE] <FILES>',
+  );
   process.exit(1);
 }
 
@@ -65,6 +68,10 @@ files.forEach(function(filename) {
   try {
     let data = fs.readFileSync(file, {encoding: 'utf-8'}).toString();
     extractor.parse(file, extract.preprocessTemplate(data, ext));
+
+    if (!parseScript) {
+      return;
+    }
 
     if (ext !== 'js') {
       data = extract.preprocessScriptTags(data, ext);
